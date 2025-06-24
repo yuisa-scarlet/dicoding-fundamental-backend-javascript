@@ -3,9 +3,26 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./src/server.js",
+    "start:dev": "nodemon ./src/server.js",
+    "lint": "eslint .src",
+    "migrate": "node-pg-migrate"
   },
-  "author": "",
+  "author": "Ervalsa Dwi Nanda",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@hapi/hapi": "^21.4.0",
+    "dotenv": "^16.5.0",
+    "joi": "^17.13.3",
+    "nanoid": "^5.1.5",
+    "node-pg-migrate": "^8.0.3",
+    "pg": "^8.16.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "eslint": "^9.29.0",
+    "globals": "^16.2.0",
+    "nodemon": "^3.1.10"
+  }
 }
