@@ -11,6 +11,12 @@ const ERROR_MESSAGES = {
     UPDATE_FAILED: "Lagu gagal diperbarui. Id tidak ditemukan",
     DELETE_FAILED: "Lagu gagal dihapus. Id tidak ditemukan",
   },
+  REFRESH_TOKEN: {
+    NOT_FOUND: "Refresh token tidak ditemukan",
+    CREATE_FAILED: "Refresh token gagal ditambahkan",
+    UPDATE_FAILED: "Refresh token gagal diperbarui",
+    DELETE_FAILED: "Refresh token gagal dihapus",
+  }
 };
 
 const SUCCESS_MESSAGES = {
@@ -28,6 +34,11 @@ const SUCCESS_MESSAGES = {
     CREATED: "Akun berhasil dibuat",
     UPDATED: "Akun berhasil diperbarui",
     DELETED: "Akun berhasil dihapus",
+  },
+  AUTH: {
+    LOGIN_SUCCESS: "Berhasil masuk",
+    REFRESH_TOKEN_UPDATED: "Refresh token berhasil diperbarui",
+    REFRESH_TOKEN_DELETED: "Refresh token berhasil dihapus",
   }
 };
 

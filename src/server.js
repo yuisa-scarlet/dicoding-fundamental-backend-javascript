@@ -3,6 +3,7 @@ require("dotenv").config();
 const Hapi = require("@hapi/hapi");
 const { closePool } = require("./utils/database");
 const config = require("./utils/config");
+const TokenManager = require("./tokenize/TokenManager");
 
 const ClientError = require("./exceptions/ClientError");
 
@@ -18,10 +19,15 @@ const users = require("./api/users");
 const UserService = require("./services/postgres/UserService");
 const UserValidator = require("./validator/user");
 
+const authentications = require("./api/authentications");
+const AuthenticationService = require("./services/postgres/AuthenticationService");
+const AuthenticationValidator = require("./validator/authentication");
+
 const init = async () => {
   const albumService = new AlbumService();
   const songService = new SongService();
   const userService = new UserService();
+  const authenticationService = new AuthenticationService();
 
   const server = Hapi.server({
     port: config.server.port,
@@ -33,6 +39,7 @@ const init = async () => {
     },
   });
 
+  // Register Albums
   await server.register({
     plugin: albums,
     options: {
@@ -41,6 +48,7 @@ const init = async () => {
     },
   });
 
+  // Register Songs
   await server.register({
     plugin: songs,
     options: {
@@ -49,13 +57,25 @@ const init = async () => {
     },
   });
 
+  // Register Users
   await server.register({
     plugin: users,
     options: {
       service: userService,
       validator: UserValidator,
     },
-  })
+  });
+
+  // Register Authentications
+  await server.register({
+    plugin: authentications,
+    options: {
+      authenticationService: authenticationService,
+      userService: userService,
+    tokenManager: TokenManager,
+      validator: AuthenticationValidator,
+    },
+  });
 
   server.ext("onPreResponse", (request, h) => {
     const { response } = request;
