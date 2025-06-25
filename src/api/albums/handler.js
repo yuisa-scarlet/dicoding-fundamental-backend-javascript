@@ -4,6 +4,8 @@ class AlbumHandler {
     this._validator = validator;
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
+    this.getDetailAlbumHandler = this.getDetailAlbumHandler.bind(this);
+    this.putAlbumHandler = this.putAlbumHandler.bind(this);
     this.deleteAlbumHandler = this.deleteAlbumHandler.bind(this);
   }
 
@@ -25,6 +27,32 @@ class AlbumHandler {
     return response;
   }
 
+  async getDetailAlbumHandler(request) {
+    const { id } = request.params;
+
+    const album = await this._service.getDetailAlbum(id);
+
+    return {
+      status: "success",
+      data: {
+        album,
+      },
+    };
+  }
+
+  async putAlbumHandler(request) {
+    this._validator.validateAlbumPayload(request.payload);
+
+    const { id } = request.params;
+
+    await this._service.editAlbum(id, request.payload);
+
+    return {
+      status: "success",
+      message: "Album berhasil diperbarui",
+    };
+  }
+
   async deleteAlbumHandler(request) {
     const { id } = request.params;
     await this._service.deleteAlbum(id);
@@ -32,7 +60,7 @@ class AlbumHandler {
     return {
       status: "success",
       message: "Album berhasil dihapus",
-    }
+    };
   }
 }
 

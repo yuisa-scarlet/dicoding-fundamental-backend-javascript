@@ -5,6 +5,16 @@ const routes = (handler) => [
     handler: handler.postAlbumHandler,
   },
   {
+    method: 'GET',
+    path: '/albums/{id}',
+    handler: handler.getDetailAlbumHandler,
+  },
+  {
+    method: 'PUT',
+    path: '/albums/{id}',
+    handler: handler.putAlbumHandler,
+  },
+  {
     method: 'DELETE',
     path: '/albums/{id}',
     handler: handler.deleteAlbumHandler,
