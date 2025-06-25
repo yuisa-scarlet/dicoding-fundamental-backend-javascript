@@ -4,6 +4,7 @@ class AlbumHandler {
     this._validator = validator;
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
+    this.deleteAlbumHandler = this.deleteAlbumHandler.bind(this);
   }
 
   async postAlbumHandler(request, h) {
@@ -22,6 +23,16 @@ class AlbumHandler {
 
     response.code(201);
     return response;
+  }
+
+  async deleteAlbumHandler(request) {
+    const { id } = request.params;
+    await this._service.deleteAlbum(id);
+
+    return {
+      status: "success",
+      message: "Album berhasil dihapus",
+    }
   }
 }
 
