@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const Hapi = require("@hapi/hapi");
+const Jwt = require("@hapi/jwt");
 const { closePool } = require("./utils/database");
 const config = require("./utils/config");
 const TokenManager = require("./tokenize/TokenManager");
@@ -23,11 +24,16 @@ const authentications = require("./api/authentications");
 const AuthenticationService = require("./services/postgres/AuthenticationService");
 const AuthenticationValidator = require("./validator/authentication");
 
+const playlists = require("./api/playlists");
+const PlaylistService = require("./services/postgres/PlaylistService");
+const PlaylistValidator = require("./validator/playlist");
+
 const init = async () => {
   const albumService = new AlbumService();
   const songService = new SongService();
   const userService = new UserService();
   const authenticationService = new AuthenticationService();
+  const playlistService = new PlaylistService();
 
   const server = Hapi.server({
     port: config.server.port,
@@ -37,6 +43,30 @@ const init = async () => {
         origin: ["*"],
       },
     },
+  });
+
+  // External plugin
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
+
+  // Authentication strategy
+  server.auth.strategy("openmusic_jwt", "jwt", {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
   });
 
   // Register Albums
@@ -72,8 +102,17 @@ const init = async () => {
     options: {
       authenticationService: authenticationService,
       userService: userService,
-    tokenManager: TokenManager,
+      tokenManager: TokenManager,
       validator: AuthenticationValidator,
+    },
+  });
+
+  // Register Playlists
+  await server.register({
+    plugin: playlists,
+    options: {
+      service: playlistService,
+      validator: PlaylistValidator,
     },
   });
 

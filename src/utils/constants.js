@@ -16,7 +16,15 @@ const ERROR_MESSAGES = {
     CREATE_FAILED: "Refresh token gagal ditambahkan",
     UPDATE_FAILED: "Refresh token gagal diperbarui",
     DELETE_FAILED: "Refresh token gagal dihapus",
-  }
+  },
+  PLAYLIST: {
+    NOT_FOUND: "Playlist tidak ditemukan",
+    CREATE_FAILED: "Playlist gagal ditambahkan",
+    UPDATE_FAILED: "Playlist gagal diperbarui. Id tidak ditemukan",
+    DELETE_FAILED: "Playlist gagal dihapus. Id tidak ditemukan",
+    ADD_SONG_FAILED: "Lagu gagal ditambahkan ke playlist",
+    REMOVE_SONG_FAILED: "Lagu gagal dihapus dari playlist",
+  },
 };
 
 const SUCCESS_MESSAGES = {
@@ -39,7 +47,14 @@ const SUCCESS_MESSAGES = {
     LOGIN_SUCCESS: "Berhasil masuk",
     REFRESH_TOKEN_UPDATED: "Refresh token berhasil diperbarui",
     REFRESH_TOKEN_DELETED: "Refresh token berhasil dihapus",
-  }
+  },
+  PLAYLIST: {
+    CREATED: "Playlist berhasil ditambahkan",
+    UPDATED: "Playlist berhasil diperbarui",
+    DELETED: "Playlist berhasil dihapus",
+    SONG_ADDED: "Lagu berhasil ditambahkan ke playlist",
+    SONG_REMOVED: "Lagu berhasil dihapus dari playlist",
+  },
 };
 
 module.exports = {
