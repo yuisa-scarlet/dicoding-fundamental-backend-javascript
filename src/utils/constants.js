@@ -24,6 +24,11 @@ const SUCCESS_MESSAGES = {
     UPDATED: "Lagu berhasil diperbarui",
     DELETED: "Lagu berhasil dihapus",
   },
+  USER: {
+    CREATED: "Akun berhasil dibuat",
+    UPDATED: "Akun berhasil diperbarui",
+    DELETED: "Akun berhasil dihapus",
+  }
 };
 
 module.exports = {
