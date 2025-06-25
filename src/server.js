@@ -1,6 +1,8 @@
 require("dotenv").config();
 
 const Hapi = require("@hapi/hapi");
+const { closePool } = require("./utils/database");
+const config = require("./utils/config");
 
 const ClientError = require("./exceptions/ClientError");
 
@@ -17,8 +19,8 @@ const init = async () => {
   const songService = new SongService();
 
   const server = Hapi.server({
-    port: process.env.PORT,
-    host: process.env.HOST,
+    port: config.server.port,
+    host: config.server.host,
     routes: {
       cors: {
         origin: ["*"],
@@ -74,6 +76,14 @@ const init = async () => {
 
   await server.start();
   console.log(`Server running at ${server.info.uri}`);
+
+  // Graceful shutdown
+  process.on("SIGINT", async () => {
+    console.log("Shutting down gracefully...");
+    await server.stop();
+    await closePool();
+    process.exit(0);
+  });
 };
 
 init();

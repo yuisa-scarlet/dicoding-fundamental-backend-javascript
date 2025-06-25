@@ -1,3 +1,6 @@
+const ResponseFormatter = require("../../utils/ResponseFormatter");
+const { SUCCESS_MESSAGES } = require("../../utils/constants");
+
 class SongHandler {
   constructor(service, validator) {
     this._service = service;
@@ -25,13 +28,9 @@ class SongHandler {
       albumId,
     });
 
-    const response = h.response({
-      status: "success",
-      message: "Lagu berhasil ditambahkan",
-      data: {
-        songId: id,
-      },
-    });
+    const response = h.response(
+      ResponseFormatter.created({ songId: id }, SUCCESS_MESSAGES.SONG.CREATED)
+    );
     response.code(201);
     return response;
   }
@@ -39,14 +38,9 @@ class SongHandler {
   async getAllSongsHandler(request) {
     const { title, performer } = request.query;
 
-    const songs = await this._service.getAllSongs({title, performer});
+    const songs = await this._service.getAllSongs({ title, performer });
 
-    return {
-      status: "success",
-      data: {
-        songs,
-      },
-    };
+    return ResponseFormatter.success({ songs });
   }
 
   async getDetailSongHandler(request) {
@@ -54,12 +48,7 @@ class SongHandler {
 
     const song = await this._service.getDetailSong(id);
 
-    return {
-      status: "success",
-      data: {
-        song,
-      },
-    };
+    return ResponseFormatter.success({ song });
   }
 
   async putSongHandler(request) {
@@ -69,10 +58,7 @@ class SongHandler {
 
     await this._service.editSong(id, request.payload);
 
-    return {
-      status: "success",
-      message: "Lagu berhasil diperbarui",
-    };
+    return ResponseFormatter.success(null, SUCCESS_MESSAGES.SONG.UPDATED);
   }
 
   async deleteSongHandler(request) {
@@ -80,10 +66,7 @@ class SongHandler {
 
     await this._service.deleteSong(id);
 
-    return {
-      status: "success",
-      message: "Lagu berhasil dihapus",
-    };
+    return ResponseFormatter.success(null, SUCCESS_MESSAGES.SONG.DELETED);
   }
 }
 

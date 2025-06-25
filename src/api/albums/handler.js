@@ -1,3 +1,6 @@
+const ResponseFormatter = require("../../utils/ResponseFormatter");
+const { SUCCESS_MESSAGES } = require("../../utils/constants");
+
 class AlbumHandler {
   constructor(service, validator) {
     this._service = service;
@@ -15,13 +18,9 @@ class AlbumHandler {
 
     const albumId = await this._service.addAlbum({ name, year });
 
-    const response = h.response({
-      status: "success",
-      message: "Album berhasil ditambahkan",
-      data: {
-        albumId,
-      },
-    });
+    const response = h.response(
+      ResponseFormatter.created({ albumId }, SUCCESS_MESSAGES.ALBUM.CREATED)
+    );
 
     response.code(201);
     return response;
@@ -32,12 +31,7 @@ class AlbumHandler {
 
     const album = await this._service.getDetailAlbum(id);
 
-    return {
-      status: "success",
-      data: {
-        album,
-      },
-    };
+    return ResponseFormatter.success({ album });
   }
 
   async putAlbumHandler(request) {
@@ -47,20 +41,14 @@ class AlbumHandler {
 
     await this._service.editAlbum(id, request.payload);
 
-    return {
-      status: "success",
-      message: "Album berhasil diperbarui",
-    };
+    return ResponseFormatter.success(null, SUCCESS_MESSAGES.ALBUM.UPDATED);
   }
 
   async deleteAlbumHandler(request) {
     const { id } = request.params;
     await this._service.deleteAlbum(id);
 
-    return {
-      status: "success",
-      message: "Album berhasil dihapus",
-    };
+    return ResponseFormatter.success(null, SUCCESS_MESSAGES.ALBUM.DELETED);
   }
 }
 
