@@ -12,7 +12,7 @@ class PlaylistService extends BaseService {
     const playlistData = {
       id,
       name,
-      owner
+      owner,
     };
 
     try {
@@ -27,7 +27,13 @@ class PlaylistService extends BaseService {
       text: `SELECT p.id, p.name, u.username 
              FROM playlists p 
              JOIN users u ON u.id = p.owner 
-             WHERE p.owner = $1`,
+             WHERE p.owner = $1
+             UNION
+             SELECT p.id, p.name, u.username 
+             FROM playlists p 
+             JOIN users u ON u.id = p.owner 
+             JOIN collaborations c ON c.playlist_id = p.id 
+             WHERE c.user_id = $1`,
       values: [owner],
     };
 
@@ -41,7 +47,7 @@ class PlaylistService extends BaseService {
 
   async verifyPlaylistOwner(id, owner) {
     const query = {
-      text: 'SELECT * FROM playlists WHERE id = $1',
+      text: "SELECT * FROM playlists WHERE id = $1",
       values: [id],
     };
 
@@ -51,16 +57,31 @@ class PlaylistService extends BaseService {
       throw new NotFoundError(ERROR_MESSAGES.PLAYLIST.NOT_FOUND);
     }
 
-    const playlist = result.rows[0];    
+    const playlist = result.rows[0];
 
     if (playlist.owner !== owner) {
-      throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+      throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
+    }
+  }
+
+  async verifyPlaylistAccess(id, userId) {
+    const query = {
+      text: `SELECT * FROM playlists WHERE id = $1 AND (owner = $2 OR id IN (
+               SELECT playlist_id FROM collaborations WHERE user_id = $2
+             ))`,
+      values: [id, userId],
+    };
+
+    const result = await this.executeQuery(query);
+
+    if (!result.rows.length) {
+      throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
     }
   }
 
   async addSongToPlaylist(playlistId, songId) {
     const id = nanoid(16);
-    
+
     const playlistSongData = {
       id,
       playlist_id: playlistId,
@@ -89,7 +110,7 @@ class PlaylistService extends BaseService {
 
   async deleteSongFromPlaylist(playlistId, songId) {
     const query = {
-      text: 'DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
+      text: "DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id",
       values: [playlistId, songId],
     };
 
@@ -101,15 +122,19 @@ class PlaylistService extends BaseService {
   }
 
   async getPlaylistById(id) {
-    const playlist = await this.findById("playlists", id, ERROR_MESSAGES.PLAYLIST.NOT_FOUND);
-    
+    const playlist = await this.findById(
+      "playlists",
+      id,
+      ERROR_MESSAGES.PLAYLIST.NOT_FOUND
+    );
+
     const userQuery = {
-      text: 'SELECT username FROM users WHERE id = $1',
+      text: "SELECT username FROM users WHERE id = $1",
       values: [playlist.owner],
     };
-    
+
     const userResult = await this.executeQuery(userQuery);
-    
+
     return {
       id: playlist.id,
       name: playlist.name,
@@ -119,7 +144,7 @@ class PlaylistService extends BaseService {
 
   async verifySongExists(songId) {
     const query = {
-      text: 'SELECT id FROM songs WHERE id = $1',
+      text: "SELECT id FROM songs WHERE id = $1",
       values: [songId],
     };
 

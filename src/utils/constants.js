@@ -25,6 +25,10 @@ const ERROR_MESSAGES = {
     ADD_SONG_FAILED: "Lagu gagal ditambahkan ke playlist",
     REMOVE_SONG_FAILED: "Lagu gagal dihapus dari playlist",
   },
+  COLLABORATION: {
+    CREATE_FAILED: "Kolaborasi gagal ditambahkan",
+    DELETE_FAILED: "Kolaborasi gagal dihapus",
+  },
 };
 
 const SUCCESS_MESSAGES = {
@@ -54,6 +58,10 @@ const SUCCESS_MESSAGES = {
     DELETED: "Playlist berhasil dihapus",
     SONG_ADDED: "Lagu berhasil ditambahkan ke playlist",
     SONG_REMOVED: "Lagu berhasil dihapus dari playlist",
+  },
+  COLLABORATION: {
+    CREATED: "Kolaborasi berhasil ditambahkan",
+    DELETED: "Kolaborasi berhasil dihapus",
   },
 };
 
