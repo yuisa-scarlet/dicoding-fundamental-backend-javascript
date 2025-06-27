@@ -1,12 +1,22 @@
 const BaseService = require("../BaseService");
 const InvariantError = require("../../exceptions/InvariantError");
-const NotFoundError = require("../../exceptions/NotFoundError");
 const { nanoid } = require("nanoid");
 const { ERROR_MESSAGES } = require("../../utils/constants");
+const NotFoundError = require("../../exceptions/NotFoundError");
 
 class CollaborationService extends BaseService {
   async addCollaboration(playlistId, userId) {
     const id = `collab-${nanoid(16)}`;
+
+    const userQuery = {
+      text: "SELECT id FROM users WHERE id = $1",
+      values: [userId],
+    };
+
+    const userResult = await this.executeQuery(userQuery);
+    if (!userResult.rows.length) {
+      throw new NotFoundError("User tidak ditemukan");
+    }
 
     const query = {
       text: "INSERT INTO collaborations (id, playlist_id, user_id) VALUES($1, $2, $3) RETURNING id",
@@ -28,18 +38,10 @@ class CollaborationService extends BaseService {
       values: [playlistId, userId],
     };
 
-    try {
-      const result = await this.executeQuery(query);
+    const result = await this.executeQuery(query);
 
-      if (!result.rows.length) {
-        throw new InvariantError("Kolaborasi tidak ditemukan");
-      }
-    } catch (error) {
-      if (error instanceof InvariantError || error instanceof NotFoundError) {
-        throw error;
-      }
-
-      throw new InvariantError(ERROR_MESSAGES.COLLABORATION.DELETE_FAILED);
+    if (!result.rows.length) {
+      throw new InvariantError("Kolaborasi tidak ditemukan");
     }
   }
 

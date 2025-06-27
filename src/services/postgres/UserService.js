@@ -61,7 +61,7 @@ class UserService extends BaseService {
     }
 
     return id;
-  }
+  }  
 }
 
 module.exports = UserService;
