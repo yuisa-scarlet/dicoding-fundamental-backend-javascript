@@ -2,8 +2,9 @@ const ResponseFormatter = require("../../utils/ResponseFormatter");
 const { SUCCESS_MESSAGES } = require("../../utils/constants");
 
 class PlaylistHandler {
-  constructor(service, validator) {
+  constructor(service, activityService, validator) {
     this._service = service;
+    this._activityService = activityService;
     this._validator = validator;
 
     this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
@@ -14,6 +15,8 @@ class PlaylistHandler {
       this.getSongsFromPlaylistHandler.bind(this);
     this.deleteSongFromPlaylistHandler =
       this.deleteSongFromPlaylistHandler.bind(this);
+    this.getPlaylistActivitiesHandler =
+      this.getPlaylistActivitiesHandler.bind(this);
   }
 
   async postPlaylistHandler(request, h) {
@@ -66,6 +69,13 @@ class PlaylistHandler {
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
     await this._service.addSongToPlaylist(playlistId, songId);
 
+    await this._activityService.addActivity(
+      playlistId,
+      credentialId,
+      songId,
+      "add"
+    );
+
     const response = h.response(
       ResponseFormatter.created(null, SUCCESS_MESSAGES.PLAYLIST.SONG_ADDED)
     );
@@ -97,10 +107,33 @@ class PlaylistHandler {
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
     await this._service.deleteSongFromPlaylist(playlistId, songId);
 
+    await this._activityService.addActivity(
+      playlistId,
+      credentialId,
+      songId,
+      "delete"
+    );
+
     return ResponseFormatter.success(
       null,
       SUCCESS_MESSAGES.PLAYLIST.SONG_REMOVED
     );
+  }
+
+  async getPlaylistActivitiesHandler(request) {
+    const { id: playlistId } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._service.verifyPlaylistAccess(playlistId, credentialId);
+
+    const activities = await this._activityService.getPlaylistActivities(
+      playlistId
+    );
+
+    return ResponseFormatter.success({
+      playlistId,
+      activities,
+    });
   }
 }
 

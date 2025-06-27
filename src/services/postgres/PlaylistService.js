@@ -65,16 +65,27 @@ class PlaylistService extends BaseService {
   }
 
   async verifyPlaylistAccess(id, userId) {
-    const query = {
+    const playlistQuery = {
+      text: "SELECT * FROM playlists WHERE id = $1",
+      values: [id],
+    };
+
+    const playlistResult = await this.executeQuery(playlistQuery);
+
+    if (!playlistResult.rows.length) {
+      throw new NotFoundError(ERROR_MESSAGES.PLAYLIST.NOT_FOUND);
+    }
+
+    const accessQuery = {
       text: `SELECT * FROM playlists WHERE id = $1 AND (owner = $2 OR id IN (
                SELECT playlist_id FROM collaborations WHERE user_id = $2
              ))`,
       values: [id, userId],
     };
 
-    const result = await this.executeQuery(query);
+    const accessResult = await this.executeQuery(accessQuery);
 
-    if (!result.rows.length) {
+    if (!accessResult.rows.length) {
       throw new AuthorizationError("Anda tidak berhak mengakses resource ini");
     }
   }
