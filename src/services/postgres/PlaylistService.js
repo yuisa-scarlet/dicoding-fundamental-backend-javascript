@@ -153,6 +153,32 @@ class PlaylistService extends BaseService {
     };
   }
 
+  async getPlaylistForExport(id) {
+    const playlist = await this.findById(
+      "playlists",
+      id,
+      ERROR_MESSAGES.PLAYLIST.NOT_FOUND
+    );
+
+    const songsQuery = {
+      text: `SELECT s.id, s.title, s.performer
+             FROM songs s
+             JOIN playlist_songs ps ON s.id = ps.song_id
+             WHERE ps.playlist_id = $1`,
+      values: [id],
+    };
+
+    const songsResult = await this.executeQuery(songsQuery);
+
+    return {
+      playlist: {
+        id: playlist.id,
+        name: playlist.name,
+        songs: songsResult.rows,
+      },
+    };
+  }
+
   async verifySongExists(songId) {
     const query = {
       text: "SELECT id FROM songs WHERE id = $1",

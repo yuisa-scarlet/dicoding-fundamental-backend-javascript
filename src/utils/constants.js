@@ -63,6 +63,9 @@ const SUCCESS_MESSAGES = {
     CREATED: "Kolaborasi berhasil ditambahkan",
     DELETED: "Kolaborasi berhasil dihapus",
   },
+  EXPORT: {
+    PLAYLIST_REQUESTED: "Permintaan Anda sedang kami proses",
+  },
 };
 
 module.exports = {

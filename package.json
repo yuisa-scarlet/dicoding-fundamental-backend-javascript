@@ -5,10 +5,12 @@
   "scripts": {
     "start": "node ./src/server.js",
     "start:dev": "nodemon ./src/server.js",
+    "start:consumer": "node consumer.js",
     "lint": "eslint ./src",
     "migrate": "node-pg-migrate",
     "test:v1": "newman run \"postman-collection/v1/Open Music API V1 Test.postman_collection.json\" --environment \"postman-collection/v1/OpenMusic API Test.postman_environment.json\"",
-    "test:v2": "newman run \"postman-collection/v2/Open Music API V2 Test.postman_collection.json\" --environment \"postman-collection/v2/OpenMusic API Test.postman_environment.json\""
+    "test:v2": "newman run \"postman-collection/v2/Open Music API V2 Test.postman_collection.json\" --environment \"postman-collection/v2/OpenMusic API Test.postman_environment.json\"",
+    "test:v3": "newman run \"postman-collection/v3/Open Music API V3 Test.postman_collection.json\" --environment \"postman-collection/v3/OpenMusic API Test.postman_environment.json\""
   },
   "author": "Ervalsa Dwi Nanda",
   "license": "ISC",
@@ -16,12 +18,14 @@
   "dependencies": {
     "@hapi/hapi": "^21.4.0",
     "@hapi/jwt": "^3.2.0",
+    "amqplib": "^0.10.8",
     "bcrypt": "^6.0.0",
     "dotenv": "^16.5.0",
     "joi": "^17.13.3",
     "nanoid": "^5.1.5",
     "newman": "^6.2.1",
     "node-pg-migrate": "^8.0.3",
+    "nodemailer": "^7.0.3",
     "pg": "^8.16.2"
   },
   "devDependencies": {
