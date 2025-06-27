@@ -121,7 +121,7 @@ class AlbumHandler {
       );
 
       const response = h.response(ResponseFormatter.success({ likes }));
-      response.header("X-Data-Source", "cache");
+      response.header("X-Data-Source", "database");
       return response;
     }
   }

@@ -8,7 +8,6 @@ const init = async () => {
   const mailSender = new MailSender();
 
   try {
-    // Connect to RabbitMQ
     const connection = await amqp.connect(process.env.RABBITMQ_SERVER);
     const channel = await connection.createChannel();
 
@@ -31,12 +30,10 @@ const init = async () => {
       );
 
       try {
-        // Get playlist data
         const playlistData = await playlistService.getPlaylistForExport(
           playlistId
         );
 
-        // Send email
         const result = await mailSender.sendEmail(
           targetEmail,
           JSON.stringify(playlistData, null, 2)
@@ -48,7 +45,6 @@ const init = async () => {
         console.error(" [✗] Failed to process export:", error.message);
       }
 
-      // Acknowledge the message
       channel.ack(message);
     });
   } catch (error) {
