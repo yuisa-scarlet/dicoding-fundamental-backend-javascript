@@ -2,10 +2,11 @@ const ResponseFormatter = require("../../utils/ResponseFormatter");
 const { SUCCESS_MESSAGES } = require("../../utils/constants");
 
 class AlbumHandler {
-  constructor(service, validator, storageService) {
+  constructor(service, validator, storageService, cacheService) {
     this._service = service;
     this._validator = validator;
     this._storageService = storageService;
+    this._cacheService = cacheService;
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
     this.getDetailAlbumHandler = this.getDetailAlbumHandler.bind(this);
@@ -80,6 +81,8 @@ class AlbumHandler {
 
     await this._service.likeAlbum(id, credentialId);
 
+    await this._cacheService.delete(`album:likes:${id}`);
+
     const response = h.response(
       ResponseFormatter.success(null, SUCCESS_MESSAGES.ALBUM.LIKED)
     );
@@ -93,15 +96,34 @@ class AlbumHandler {
 
     await this._service.unlikeAlbum(id, credentialId);
 
+    await this._cacheService.delete(`album:likes:${id}`);
+
     return ResponseFormatter.success(null, SUCCESS_MESSAGES.ALBUM.UNLIKED);
   }
 
-  async getAlbumLikesHandler(request) {
+  async getAlbumLikesHandler(request, h) {
     const { id } = request.params;
 
-    const likes = await this._service.getAlbumLikes(id);
+    try {
+      const result = await this._cacheService.get(`album:likes:${id}`);
+      const likes = JSON.parse(result);
 
-    return ResponseFormatter.success({ likes });
+      const response = h.response(ResponseFormatter.success({ likes }));
+      response.header("X-Data-Source", "cache");
+      return response;
+    } catch {
+      const likes = await this._service.getAlbumLikes(id);
+
+      await this._cacheService.set(
+        `album:likes:${id}`,
+        JSON.stringify(likes),
+        1800
+      );
+
+      const response = h.response(ResponseFormatter.success({ likes }));
+      response.header("X-Data-Source", "cache");
+      return response;
+    }
   }
 }
 
