@@ -12,6 +12,9 @@ class AlbumHandler {
     this.putAlbumHandler = this.putAlbumHandler.bind(this);
     this.deleteAlbumHandler = this.deleteAlbumHandler.bind(this);
     this.postUploadImageHandler = this.postUploadImageHandler.bind(this);
+    this.postAlbumLikeHandler = this.postAlbumLikeHandler.bind(this);
+    this.deleteAlbumLikeHandler = this.deleteAlbumLikeHandler.bind(this);
+    this.getAlbumLikesHandler = this.getAlbumLikesHandler.bind(this);
   }
 
   async postAlbumHandler(request, h) {
@@ -69,6 +72,36 @@ class AlbumHandler {
     );
     response.code(201);
     return response;
+  }
+
+  async postAlbumLikeHandler(request, h) {
+    const { id } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._service.likeAlbum(id, credentialId);
+
+    const response = h.response(
+      ResponseFormatter.success(null, SUCCESS_MESSAGES.ALBUM.LIKED)
+    );
+    response.code(201);
+    return response;
+  }
+
+  async deleteAlbumLikeHandler(request) {
+    const { id } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._service.unlikeAlbum(id, credentialId);
+
+    return ResponseFormatter.success(null, SUCCESS_MESSAGES.ALBUM.UNLIKED);
+  }
+
+  async getAlbumLikesHandler(request) {
+    const { id } = request.params;
+
+    const likes = await this._service.getAlbumLikes(id);
+
+    return ResponseFormatter.success({ likes });
   }
 }
 

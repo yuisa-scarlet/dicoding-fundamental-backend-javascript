@@ -62,6 +62,58 @@ class AlbumService extends BaseService {
   async deleteAlbum(id) {
     await this.delete("albums", id, ERROR_MESSAGES.ALBUM.DELETE_FAILED);
   }
+
+  async likeAlbum(albumId, userId) {
+    await this.findById("albums", albumId, ERROR_MESSAGES.ALBUM.NOT_FOUND);
+
+    const checkQuery = {
+      text: "SELECT id FROM user_album_likes WHERE user_id = $1 AND album_id = $2",
+      values: [userId, albumId],
+    };
+
+    const checkResult = await this.executeQuery(checkQuery);
+
+    if (checkResult.rows.length > 0) {
+      throw new InvariantError("Album sudah disukai sebelumnya");
+    }
+
+    const { nanoid } = require("nanoid");
+    const id = nanoid(16);
+
+    const insertQuery = {
+      text: "INSERT INTO user_album_likes VALUES($1, $2, $3)",
+      values: [id, userId, albumId],
+    };
+
+    await this.executeQuery(insertQuery);
+  }
+
+  async unlikeAlbum(albumId, userId) {
+    await this.findById("albums", albumId, ERROR_MESSAGES.ALBUM.NOT_FOUND);
+
+    const deleteQuery = {
+      text: "DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2",
+      values: [userId, albumId],
+    };
+
+    const result = await this.executeQuery(deleteQuery);
+
+    if (!result.rowCount) {
+      throw new InvariantError("Gagal batal menyukai album");
+    }
+  }
+
+  async getAlbumLikes(albumId) {
+    await this.findById("albums", albumId, ERROR_MESSAGES.ALBUM.NOT_FOUND);
+
+    const query = {
+      text: "SELECT COUNT(*) FROM user_album_likes WHERE album_id = $1",
+      values: [albumId],
+    };
+
+    const result = await this.executeQuery(query);
+    return parseInt(result.rows[0].count);
+  }
 }
 
 module.exports = AlbumService;

@@ -36,6 +36,8 @@ const SUCCESS_MESSAGES = {
     CREATED: "Album berhasil ditambahkan",
     UPDATED: "Album berhasil diperbarui",
     DELETED: "Album berhasil dihapus",
+    LIKED: "Album berhasil disukai",
+    UNLIKED: "Album batal disukai",
   },
   SONG: {
     CREATED: "Lagu berhasil ditambahkan",
