@@ -7,7 +7,7 @@ const { ERROR_MESSAGES } = require("../../utils/constants");
 
 class PlaylistService extends BaseService {
   async addPlaylist({ name, owner }) {
-    const id = `playlist-${nanoid(16)}`;
+    const id = nanoid(16);
 
     const playlistData = {
       id,
@@ -59,7 +59,7 @@ class PlaylistService extends BaseService {
   }
 
   async addSongToPlaylist(playlistId, songId) {
-    const id = `playlistsong-${nanoid(16)}`;
+    const id = nanoid(16);
     
     const playlistSongData = {
       id,
