@@ -19,12 +19,12 @@ class PlaylistActivityService extends BaseService {
 
   async getPlaylistActivities(playlistId) {
     const query = {
-      text: `SELECT pa.id, u.username, s.title, pa.action, pa.time
+      text: `SELECT u.username, s.title, pa.action, pa.time
              FROM playlist_activities pa
              JOIN users u ON u.id = pa.user_id
              JOIN songs s ON s.id = pa.song_id
              WHERE pa.playlist_id = $1
-             ORDER BY pa.time DESC`,
+             ORDER BY pa.time ASC`,
       values: [playlistId],
     };
 
