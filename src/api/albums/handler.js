@@ -2,14 +2,16 @@ const ResponseFormatter = require("../../utils/ResponseFormatter");
 const { SUCCESS_MESSAGES } = require("../../utils/constants");
 
 class AlbumHandler {
-  constructor(service, validator) {
+  constructor(service, validator, storageService) {
     this._service = service;
     this._validator = validator;
+    this._storageService = storageService;
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
     this.getDetailAlbumHandler = this.getDetailAlbumHandler.bind(this);
     this.putAlbumHandler = this.putAlbumHandler.bind(this);
     this.deleteAlbumHandler = this.deleteAlbumHandler.bind(this);
+    this.postUploadImageHandler = this.postUploadImageHandler.bind(this);
   }
 
   async postAlbumHandler(request, h) {
@@ -49,6 +51,24 @@ class AlbumHandler {
     await this._service.deleteAlbum(id);
 
     return ResponseFormatter.success(null, SUCCESS_MESSAGES.ALBUM.DELETED);
+  }
+
+  async postUploadImageHandler(request, h) {
+    const { cover } = request.payload;
+    const { id } = request.params;
+
+    this._validator.validateImageHeaders(cover.hapi.headers);
+
+    const filename = await this._storageService.writeFile(cover, cover.hapi);
+    const coverUrl = `http://${process.env.HOST}:${process.env.PORT}/upload/${filename}`;
+
+    await this._service.editAlbum(id, { coverUrl });
+
+    const response = h.response(
+      ResponseFormatter.success(null, "Sampul berhasil diunggah")
+    );
+    response.code(201);
+    return response;
   }
 }
 

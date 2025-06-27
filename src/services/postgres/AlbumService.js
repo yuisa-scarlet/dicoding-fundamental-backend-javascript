@@ -43,10 +43,11 @@ class AlbumService extends BaseService {
     return mappedAlbum;
   }
 
-  async editAlbum(id, { name, year }) {
+  async editAlbum(id, { name, year, coverUrl }) {
     const updateData = {
-      name,
-      year,
+      ...(name && { name }),
+      ...(year && { year }),
+      ...(coverUrl && { cover_url: coverUrl }),
       updated_at: new Date().toISOString(),
     };
 
